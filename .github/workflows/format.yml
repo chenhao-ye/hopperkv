@@ -1,0 +1,33 @@
+name: Format
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  format:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{github.head_ref}}
+
+      - name: Clang Format Check
+        run: clang-format -n -Werror --style=file hopperkv/**/*.cpp hopperkv/**/*.h
+
+      - name: Ruff Check
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check
+          src: .
+
+      - name: Ruff Format
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format --check
+          src: .
+
+      - name: Spell Check
+        uses: crate-ci/typos@v1.31.2

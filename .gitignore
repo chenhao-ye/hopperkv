@@ -1,0 +1,14 @@
+.vscode
+.cache
+*.so
+__pycache__
+
+/build
+/build-*
+/images
+/results
+/install
+/ckpt
+/trace
+run_mp.log
+*.csv

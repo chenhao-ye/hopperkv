@@ -1,0 +1,13 @@
+[submodule "lib/RedisModulesSDK"]
+	path = lib/RedisModulesSDK
+	url = https://github.com/RedisLabsModules/RedisModulesSDK.git
+[submodule "lib/gcache"]
+	path = lib/gcache
+	url = https://github.com/chenhao-ye/gcache.git
+[submodule "lib/pybind11"]
+	path = lib/pybind11
+	url = https://github.com/pybind/pybind11.git
+	branch = stable
+[submodule "lib/spdlog"]
+	path = lib/spdlog
+	url = https://github.com/gabime/spdlog.git
