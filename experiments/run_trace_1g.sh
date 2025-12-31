@@ -8,12 +8,6 @@ USE_LOCAL=${USE_LOCAL:-0}
 # whether using mocked DynamoDB
 USE_MOCK=${USE_MOCK:-0}
 
-echo "=== Configuration ==="
-echo "USE_CLOUDLAB=${USE_CLOUDLAB}"
-echo "USE_LOCAL=${USE_LOCAL}"
-echo "USE_MOCK=${USE_MOCK}"
-echo "====================="
-
 if [ "$USE_CLOUDLAB" != "0" ]; then
   # assume use 6 client nodes
   remote_clients=(
