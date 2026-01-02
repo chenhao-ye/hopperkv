@@ -1,5 +1,6 @@
 #!/bin/bash
 # This script creates checkpoints for dynamic experiments with global pool
+# This script takes ~20 minutes to finish
 
 set -euxo pipefail
 

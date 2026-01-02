@@ -1,4 +1,6 @@
 #!/bin/bash
+# Create checkpoints for varying working set sizes
+# This script takes ~2 hours to finish
 set -euxo pipefail
 
 sudo sysctl vm.overcommit_memory=1

@@ -1,5 +1,6 @@
 #!/bin/bash
 # This script creates checkpoints for scaling experiments with global pool
+# This script takes ~30 minutes to finish
 
 set -euxo pipefail
 
@@ -42,6 +43,7 @@ uv run -m driver.run \
   -d "results/ckpt/global_scale" \
   -t 1800 --preheat_duration 60 \
   -b 2Gi 1k 1k 50M \
+  --mock_dynamo \
   --num_preload 4 \
   --alloc_sched 1100 --skip_alloc \
   --dump_ckpt_paths "${ckpt_paths[@]}" \

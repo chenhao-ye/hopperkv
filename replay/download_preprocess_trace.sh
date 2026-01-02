@@ -1,6 +1,11 @@
 #!/bin/bash
 set -euxo pipefail
 
+# KNOWN ISSUE: CloudLab Wisconsin cluster has issues connecting to the trace source servers.
+# It is recommended to run this script on other clusters.
+
+# This script takes ~20 minutes to finish
+
 cluster_list=(
   cluster2
   cluster19
@@ -27,7 +32,7 @@ for cluster in "${cluster_list[@]}"; do
     --max-timestamp "${max_ts}" \
   | tee "trace/${cluster}.sort" \
   | uv run replay/preprocess.py --dump-dir "trace/${trace_name}" \
-    --min-timestamp "${min_ts}" --max-timestamp "${max_ts}" 2>&1 \
+    --min-timestamp "${min_ts}" --max-timestamp "${max_ts}" 2> "trace/${trace_name}.stderr" \
   | tee "trace/${trace_name}.log" &
 done
 

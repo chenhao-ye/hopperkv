@@ -2,21 +2,21 @@
 set -euxo pipefail
 
 # whether running on CloudLab or AWS
-USE_CLOUDLAB=${USE_CLOUDLAB:-0}  # else, use AWS
+USE_CLOUDLAB=${USE_CLOUDLAB:-1}  # else, use AWS
 # whether running clients on the local machine or remote machines
 USE_LOCAL=${USE_LOCAL:-0}
 # whether using mocked DynamoDB
-USE_MOCK=${USE_MOCK:-0}
+USE_MOCK=${USE_MOCK:-1}
 
-echo "=== Configuration ==="
-echo "USE_CLOUDLAB=${USE_CLOUDLAB}"
-echo "USE_LOCAL=${USE_LOCAL}"
-echo "USE_MOCK=${USE_MOCK}"
-echo "====================="
+REQUIRED_CLIENTS=2
 
 if [ "$USE_CLOUDLAB" != "0" ]; then
-  # assume use 2 client nodes
-  remote_clients=( "10.10.1.2" "10.10.1.3" )
+  NUM_NODES=${NUM_NODES:-2}
+  remote_clients=()  # infer remote_clients IPs based on NUM_NODES
+  for i in $(seq 0 $((REQUIRED_CLIENTS - 1))); do
+    node_idx=$((i % NUM_NODES))
+    remote_clients+=("10.10.1.$((node_idx + 2))")
+  done
   if [ "$USE_LOCAL" = "0" ]; then
     server_addr="10.10.1.1"
   else
@@ -32,6 +32,13 @@ else  # use AWS
       --output=text
   )
   server_addr=$(hostname -I | awk '{print $NF}')
+fi
+
+# validate that we have the required number of clients
+if [ "${#remote_clients[@]}" -ne "$REQUIRED_CLIENTS" ]; then
+  echo "ERROR: Expected $REQUIRED_CLIENTS clients, but got ${#remote_clients[@]}"
+  echo "remote_clients: ${remote_clients[*]}"
+  exit 1
 fi
 
 remote_args=()

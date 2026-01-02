@@ -4,13 +4,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 
 set(RM_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/RedisModulesSDK)
+set(RMHEADER_PATH ${RM_PATH}/7.0)
 set(RMUTIL_DIR ${RM_PATH}/rmutil)
 set(RMUTIL_LIB ${RMUTIL_DIR}/librmutil.a)
 set(GCACHE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/gcache/include)
 set(DYNAMO_PATH ${CMAKE_CURRENT_SOURCE_DIR}/dynamo)
 set(AWSSDK_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/aws-sdk-cpp/install)
 
-include_directories(${RM_PATH})
+include_directories(${RMHEADER_PATH})
 include_directories(${GCACHE_PATH})
 include_directories(${DYNAMO_PATH})
 
@@ -58,7 +59,7 @@ add_library(hopper_redis_module MODULE
 	storage.cpp
 	storage.h
 	task.h
-	${RM_PATH}/redismodule.h
+	${RMHEADER_PATH}/redismodule.h
 )
 
 add_dependencies(hopper_redis_module rmutil_build)

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(hopperkv)
 set(CMAKE_CXX_STANDARD 20)
 
-option(BUILD_REDIS_MODULE "Build HARE Redis module" ON)
+option(BUILD_REDIS_MODULE "Build Hopper Redis module" ON)
 option(BUILD_ALLOC_ENGINE "Build HARE alloc engine" ON)
 
 enable_testing()

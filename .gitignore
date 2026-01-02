@@ -12,3 +12,5 @@ __pycache__
 /trace
 run_mp.log
 *.csv
+/prepare_artifact.log
+/run_artifact.log
