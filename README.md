@@ -17,8 +17,8 @@ Below is a quick walkthrough of the codebase.
 
 - `hopperkv/`: the core of HopperKV. It consists of a Redis Module (`hopperkv/redis_module`) and an allocator (`hopperkv/alloc`). `hopperkv` itself is a Python module that can be imported.
 
-  - The redis module will be compiled into `libhopper_redis_module.so` and loaded into Redis server processes. These code will not be accessible through Python APIs.
-  - The allocator consists of C++ code and Python code. The C++ code will be compiled into `hare_alloc_engine.cpython-***.so` (`***` depends on the platform) and accessible as a python module via pybind.
+  - The redis module will be compiled into `libhopper_redis_module.so` and loaded into Redis server processes.
+  - The allocator consists of C++ code and Python code. The C++ code will be compiled into `hare_alloc_engine.cpython-***.so` (`***` depends on the platform) and accessible as a Python module via pybind.
 
 - `driver/`: the driver code to launch and orchestrate server and client processes. The major entry point is `run` and `run_mp`.
 
