@@ -35,6 +35,6 @@ bash lib/aws-sdk-cpp.sh
 
 curl -LsSf https://astral.sh/uv/install.sh | sh
 # shellcheck disable=SC1090,SC1091
-source ~/.bashrc
+. "$HOME/.local/bin/env"
 
 uv sync
