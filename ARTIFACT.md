@@ -1,6 +1,6 @@
 # HopperKV Artifact
 
-This document describe the procedure to reproduce the experiments in the FAST'26 paper *Cache-Centric Multi-Resource Allocation for Storage Services*. The original experiments in the paper run on an AWS EC2 cluster with real DynamoDB. This document provides instructions to reproduce all experiments on CloudLab with a mocked DynamoDB backend, which enables an easy-to-use development environment without expensive AWS bills.
+This document describe the instructions to reproduce the HopperKV experiments in the FAST'26 paper [*Cache-Centric Multi-Resource Allocation for Storage Services*](https://www.usenix.org/conference/fast26/presentation/ye). The original experiments in the paper run on an AWS EC2 cluster with real DynamoDB. This document provides instructions to reproduce all experiments on CloudLab with a mocked DynamoDB backend, which enables an easy-to-use development environment without expensive AWS bills.
 
 ## Cluster Setup
 
@@ -36,11 +36,11 @@ The experiment data are saved in `results/`. The main results are the following 
 - `results/exper_trace_512m/norm_tput_cdf.pdf` and `results/exper_trace_512m/norm_tput.pdf` (Figure 9a)
 - `results/exper_trace_1g/norm_tput_cdf.pdf` and `results/exper_trace_1g/norm_tput.pdf` (Figure 9b)
 
-*Note: the policy "Non-Part" may cause the system converging to a different state, so its curve may not be an exact match to that in the paper.*
+*Note: the policy "Non-Part" may cause the system converging to a different state; therefore, its curves may not exactly match those reported in the paper.
 
 ## Detailed Reproduction Instructions
 
-This section provides detailed, step-by-step instructions for experiments in [**Quick Reproduction**](#quick-reproduction); feel free to skip.
+This section provides detailed, step-by-step instructions for experiments in [Quick Reproduction](#quick-reproduction); feel free to skip.
 
 ### Set up Environments
 
