@@ -117,7 +117,7 @@ void reply_ghost_stats(RedisModuleCtx *ctx, stats::MemStats &ms) {
   }
 
   for (auto [c_count, c_size, _] : curve) {
-    if (ms.keys_count > c_count) break;
+    if (c_count > ms.keys_count) break;
     mem_amplify = bytes_per_key / (double(c_size) / c_count);
   }
 
@@ -221,37 +221,68 @@ int load() { // -1 for file open failure; 0 for success
 // take jemalloc class allocation into consideration (based on profiling)
 namespace mem_estimate {
 
-// round size based on jemalloc slab allocator
-uint32_t round_size(uint32_t s) {
-  // common case: quick lookup
-  if (s <= 4) return 4;
-  if (s <= 60) return (s + 3) / 8 * 8 + 4;
-  if (s <= 124) return (s + 3) / 16 * 16 + 12;
-  if (s <= 252) return (s + 3) / 32 * 32 + 28;
-  if (s <= 508) return (s + 3) / 64 * 64 + 60;
-  if (s <= 1020) return (s + 3) / 128 * 128 + 124;
-  if (s <= 2044) return (s + 3) / 256 * 256 + 252;
-  if (s <= 4092) return (s + 3) / 512 * 512 + 508;
-  // larger range fall back to more general rounding
-
-  // The pattern:
-  // for divisor = 2^power, upper_bound = divisor * 8 - 4, offset = divisor - 4
-  uint32_t power = 3; // Start with 2^3 = 8
-  while (true) {
-    uint32_t divisor = 1 << power; // 2^power using bit shift
-    uint32_t upper_bound = divisor * 8 - 4;
-    if (s <= upper_bound) {
-      uint32_t offset = divisor - 4;
-      return (s + 3) / divisor * divisor + offset;
-    }
-    power++;
-  }
+static inline size_t ceil_to_multiple(size_t x, size_t m) {
+  return ((x + m - 1) / m) * m;
 }
 
-uint32_t estimate(uint32_t key_size, uint32_t val_size) {
-  // 55 is based on offline profiling and linear regression
-  static constexpr uint32_t fixed_cost = 55;
-  return fixed_cost + round_size(key_size) + round_size(val_size);
+static inline uint32_t prev_power_of_two(uint32_t x) {
+  uint32_t p = 1;
+  while ((p << 1) <= x) p <<= 1;
+  return p;
+}
+
+// Jemalloc size class rounding based on actual nallocx() behavior
+static inline uint32_t jemalloc_size(uint32_t s) {
+  if (s == 0) return 0;
+  if (s <= 64) return ceil_to_multiple(s, 8);
+  if (s <= 128) return ceil_to_multiple(s, 16);
+  if (s <= 256) return ceil_to_multiple(s, 32);
+  if (s <= 512) return ceil_to_multiple(s, 64);
+  if (s <= 1024) return ceil_to_multiple(s, 128);
+  if (s <= 2048) return ceil_to_multiple(s, 256);
+  if (s <= 4096) return ceil_to_multiple(s, 512);
+  if (s <= 8192) return ceil_to_multiple(s, 1024);
+  if (s <= 16384) return ceil_to_multiple(s, 2048);
+  if (s <= 32768) return ceil_to_multiple(s, 4096);
+  if (s <= 65536) return ceil_to_multiple(s, 8192);
+  if (s <= 131072) return ceil_to_multiple(s, 16384);
+  if (s <= 262144) return ceil_to_multiple(s, 32768);
+  // For larger sizes, use general formula: step = base/8
+  uint32_t base = prev_power_of_two(s);
+  uint32_t step = base >> 3;
+  return ceil_to_multiple(s, step);
+}
+
+uint32_t estimate(uint32_t key_len, uint32_t value_len) {
+  // 1. dictEntry: 24 bytes (key ptr + value union + next ptr)
+  uint32_t dict_entry = jemalloc_size(24); // 24
+
+  // 2. Key SDS: header + data + null terminator
+  // Keys are stored as raw SDS strings via sdsdup() in db.c:201
+  uint32_t key_sds_header = (key_len < 32)      ? 1  // sdshdr5
+                            : (key_len < 256)   ? 3  // sdshdr8
+                            : (key_len < 65536) ? 5  // sdshdr16
+                                                : 9; // sdshdr32
+  uint32_t key_sds = jemalloc_size(key_sds_header + key_len + 1);
+
+  // 3. Value: EMBSTR (<=44 bytes) vs RAW (>44 bytes)
+  uint32_t value_obj, value_sds;
+  if (value_len <= 44) {
+    // EMBSTR: single allocation for robj + sdshdr8 + value + null
+    value_obj = jemalloc_size(16 + 3 + value_len + 1);
+    value_sds = 0;
+  } else {
+    // RAW: separate allocations
+    value_obj = jemalloc_size(16);
+    uint32_t value_sds_header = (value_len < 256)     ? 3
+                                : (value_len < 65536) ? 5
+                                                      : 9;
+    value_sds = jemalloc_size(value_sds_header + value_len + 1);
+  }
+
+  // per entry overhead for pointer (plus some empty space)
+  uint32_t hash_table_overhead = 10;
+  return dict_entry + key_sds + value_obj + value_sds + hash_table_overhead;
 }
 
 } // namespace mem_estimate
