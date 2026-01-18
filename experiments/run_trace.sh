@@ -124,7 +124,7 @@ mock_image_paths=(
   'trace/cluster54_12-13h/persist_image.csv'
 )
 
-data_dir="results/exper_trace_1g"
+data_dir="results/exper_trace"
 
 uv run -m driver.run_mp pipeline \
   "${workloads[@]}" \
