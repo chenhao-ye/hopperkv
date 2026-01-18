@@ -111,11 +111,10 @@ This should produce a figure `results/exper_dyn/tput_timeline.pdf` (Figure 8).
 
 ### Dynamic Trace-Replay Macrobenchmark
 
-The trace-replay macrobenchmarks run in two settings, one with 0.5GB baseline cache and another with 1GB:
+To run trace-replay macrobenchmark:
 
 ```shell
-bash experiments/run_trace_512m.sh  # with 0.5GB baseline cache; may take ~0.3 hours
-bash experiments/run_trace_1g.sh    # with 1GB baseline cache; may take ~0.3 hours
+bash experiments/run_trace.sh  # may take ~0.3 hours
 ```
 
-This should produce four figures `results/exper_trace_512m/norm_tput_cdf.pdf` (Figure 9a, left), `results/exper_trace_512m/norm_tput.pdf` (Figure 9a, right), `results/exper_trace_1g/norm_tput_cdf.pdf` (Figure 9b, left), and `results/exper_trace_1g/norm_tput.pdf` (Figure 9b, right).
+This should produce two figures `results/exper_trace/norm_tput_cdf.pdf` (Figure 9, left), `results/exper_trace/norm_tput.pdf` (Figure 9, right).
